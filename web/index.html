@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>NeoLaptop | Sistema de Ventas de Laptops</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient: radial-gradient(circle at top, #3b82f6 0%, #020617 40%, #000000 100%);
+            --card-bg: rgba(15, 23, 42, 0.9);
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.15);
+            --text-main: #e5e7eb;
+            --text-soft: #9ca3af;
+            --highlight: #facc15;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        .bg-glow {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .bg-glow::before,
+        .bg-glow::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(80px);
+            opacity: 0.5;
+        }
+
+        .bg-glow::before {
+            width: 460px;
+            height: 460px;
+            background: #22c55e;
+            top: -120px;
+            left: -80px;
+        }
+
+        .bg-glow::after {
+            width: 520px;
+            height: 520px;
+            background: #6366f1;
+            bottom: -160px;
+            right: -120px;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 1280px;
+            padding: 24px 18px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        @media (min-width: 1024px) {
+            .wrapper {
+                padding: 28px 24px 40px;
+            }
+        }
+
+        /* NAVBAR */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow:
+                0 18px 45px rgba(15, 23, 42, 0.85),
+                0 0 0 1px rgba(15, 23, 42, 1);
+            backdrop-filter: blur(18px);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: conic-gradient(from 180deg, #22c55e, #3b82f6, #f97316, #22c55e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.9);
+        }
+
+        .nav-logo span {
+            font-weight: 800;
+            font-size: 18px;
+            color: #020617;
+        }
+
+        .nav-title-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .nav-subtitle {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+
+        .nav-tags {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-chip {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--text-soft);
+            backdrop-filter: blur(18px);
+        }
+
+        .nav-chip.highlight {
+            border-color: rgba(250, 204, 21, 0.85);
+            color: #fefce8;
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(59, 130, 246, 0.16));
+        }
+
+        /* LAYOUT PRINCIPAL */
+        .main-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 3fr) minmax(0, 2.7fr);
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 920px) {
+            .main-layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        /* HERO */
+        .hero {
+            position: relative;
+            border-radius: 32px;
+            padding: 26px 24px 22px;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.11), transparent 55%),
+                        radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.14), transparent 60%),
+                        rgba(15, 23, 42, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            box-shadow:
+                0 22px 60px rgba(15, 23, 42, 0.9),
+                0 0 0 1px rgba(15, 23, 42, 0.95);
+            overflow: hidden;
+        }
+
+        .hero-tagline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 11px 4px 4px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            margin-bottom: 18px;
+        }
+
+        .hero-pulse {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: radial-gradient(circle at center, #22c55e, #16a34a);
+            box-shadow: 0 0 24px rgba(22, 163, 74, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-pulse::after {
+            content: "";
+            position: absolute;
+            inset: 2px;
+            border-radius: inherit;
+            border: 2px solid rgba(15, 23, 42, 0.9);
+        }
+
+        .hero-tagline span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text-soft);
+        }
+
+        .hero-heading {
+            font-size: clamp(28px, 3vw + 6px, 38px);
+            line-height: 1.1;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .hero-gradient-text {
+            background: linear-gradient(120deg, #e5e7eb, #38bdf8, #facc15);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: var(--text-soft);
+            max-width: 420px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .hero-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            min-width: 120px;
+            padding: 10px 14px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            backdrop-filter: blur(16px);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 2px;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .metric-extra {
+            font-size: 11px;
+            color: rgba(52, 211, 153, 0.9);
+        }
+
+        .metric-value span {
+            font-size: 12px;
+            color: var(--text-soft);
+            font-weight: 500;
+        }
+
+        .hero-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        @media (max-width: 640px) {
+            .hero-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .hero-tag {
+            font-size: 11px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            background: rgba(15, 23, 42, 0.96);
+            color: var(--text-soft);
+        }
+
+        .hero-tag strong {
+            color: #e5e7eb;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            width: 220px;
+            max-width: 50%;
+            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hero-image-card {
+            position: relative;
+            border-radius: 22px;
+            overflow: hidden;
+            background: radial-gradient(circle at top, rgba(56, 189, 248, 0.3), #020617);
+            border: 1px solid rgba(148, 163, 184, 0.85);
+            box-shadow:
+                0 16px 42px rgba(15, 23, 42, 1),
+                0 0 60px rgba(56, 189, 248, 0.7);
+            aspect-ratio: 4 / 3;
+        }
+
+        .hero-image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: lighten;
+            opacity: 0.95;
+        }
+
+        .hero-image-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            font-size: 11px;
+            color: var(--text-soft);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(14px);
+        }
+
+        .hero-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+        }
+
+        /* LISTA LATERAL */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .side-header {
+            padding: 14px 18px;
+            border-radius: 22px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            backdrop-filter: blur(18px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .side-header-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text-soft);
+        }
+
+        .side-header-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .side-header-dot span {
+            width: 5px;
+            height: 5px;
+            border-radius: inherit;
+            background: var(--highlight);
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+        }
+
+        .side-header-info {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+
+        .side-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 12px;
+        }
+
+        /* TARJETAS DE LAPTOPS */
+        .laptop-card {
+            position: relative;
+            border-radius: 22px;
+            background: var(--card-bg);
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            overflow: hidden;
+            padding: 10px 11px 10px;
+            display: grid;
+            grid-template-columns: 120px minmax(0, 1fr);
+            gap: 10px;
+            cursor: default;
+            box-shadow:
+                0 16px 40px rgba(15, 23, 42, 0.95),
+                0 0 0 1px rgba(15, 23, 42, 1);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+        }
+
+        .laptop-card:hover {
+            transform: translateY(-3px) translateX(1px);
+            box-shadow:
+                0 24px 60px rgba(15, 23, 42, 0.9),
+                0 0 32px rgba(56, 189, 248, 0.5);
+            border-color: rgba(56, 189, 248, 0.9);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.96));
+        }
+
+        .laptop-image {
+            border-radius: 16px;
+            overflow: hidden;
+            background: radial-gradient(circle at top, rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 1));
+            position: relative;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+        }
+
+        .laptop-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.1);
+        }
+
+        .laptop-tag-pill {
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            color: var(--highlight);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .laptop-body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .laptop-main-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            align-items: flex-start;
+        }
+
+        .laptop-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .laptop-series {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+
+        .laptop-price-block {
+            text-align: right;
+        }
+
+        .laptop-price {
+            font-size: 17px;
+            font-weight: 700;
+            color: #e5e7eb;
+        }
+
+        .laptop-price span {
+            font-size: 11px;
+            color: var(--text-soft);
+            font-weight: 500;
+        }
+
+        .laptop-label {
+            font-size: 10px;
+            color: rgba(52, 211, 153, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+        }
+
+        .laptop-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .spec-pill {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            color: var(--text-soft);
+        }
+
+        .spec-pill.highlight {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: rgba(56, 189, 248, 0.9);
+            color: #e0f2fe;
+        }
+
+        .laptop-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .laptop-badges {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .badge-square {
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 7px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.96);
+            color: var(--text-soft);
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+
+        .stars {
+            font-size: 12px;
+            color: #facc15;
+        }
+
+        /* SECCIÓN CATÁLOGO */
+        .catalog-section {
+            margin-top: 18px;
+            border-radius: 28px;
+            background: rgba(15, 23, 42, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.65);
+            padding: 18px 18px 16px;
+            box-shadow:
+                0 20px 52px rgba(15, 23, 42, 1),
+                0 0 0 1px rgba(15, 23, 42, 1);
+        }
+
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .catalog-title {
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--text-soft);
+        }
+
+        .catalog-subtitle {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+
+        .catalog-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .catalog-pill {
+            font-size: 10px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.98);
+            color: var(--text-soft);
+        }
+
+        .catalog-grid {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        @media (max-width: 1024px) {
+            .catalog-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .catalog-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .catalog-grid {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+        }
+
+        .mini-card {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            background: radial-gradient(circle at top, rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 1));
+            aspect-ratio: 4/3;
+            box-shadow:
+                0 14px 32px rgba(15, 23, 42, 0.9),
+                0 0 0 1px rgba(15, 23, 42, 1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mini-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(56, 189, 248, 0.9);
+            box-shadow:
+                0 20px 40px rgba(15, 23, 42, 0.95),
+                0 0 32px rgba(56, 189, 248, 0.6);
+        }
+
+        .mini-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.92;
+        }
+
+        .mini-card-info {
+            position: absolute;
+            inset: auto 8px 7px 8px;
+            border-radius: 999px;
+            padding: 4px 9px;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mini-name {
+            font-size: 11px;
+            color: #e5e7eb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mini-price {
+            font-size: 11px;
+            color: var(--highlight);
+            font-weight: 600;
+        }
+
+        .mini-corner-tag {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            color: var(--text-soft);
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--text-soft);
+            text-align: center;
+        }
+
+        .footer span {
+            color: #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<div class="wrapper">
+    <!-- NAVBAR -->
+    <header class="nav">
+        <div class="nav-left">
+            <div class="nav-logo">
+                <span>NL</span>
+            </div>
+            <div class="nav-title-block">
+                <div class="nav-brand">NEOLAPTOP STUDIO</div>
+                <div class="nav-subtitle">Sistema visual de ventas de laptops — solo diseño</div>
+            </div>
+        </div>
+        <div class="nav-tags">
+            <div class="nav-chip highlight">Colección 2025</div>
+            <div class="nav-chip">Ultrabooks</div>
+            <div class="nav-chip">Gaming</div>
+            <div class="nav-chip">Workstation</div>
+        </div>
+    </header>
+
+    <!-- LAYOUT PRINCIPAL -->
+    <main class="main-layout">
+        <!-- HERO PRINCIPAL -->
+        <section class="hero">
+            <div class="hero-tagline">
+                <div class="hero-pulse"></div>
+                <span>Diseño premium · catálogo estático</span>
+            </div>
+
+            <h1 class="hero-heading">
+                Sistema visual de <span class="hero-gradient-text">ventas de laptops</span> listo para impresionar.
+            </h1>
+
+            <p class="hero-subtitle">
+                Explora una vitrina digital con equipos seleccionados para gaming, productividad y creación.
+                Todo en una sola pantalla, sin botones, solo imágenes y diseño.
+            </p>
+
+            <div class="hero-metrics">
+                <div class="metric-card">
+                    <div class="metric-label">Modelos destacados</div>
+                    <div class="metric-value">12 <span>laptops</span></div>
+                    <div class="metric-extra">Curadas para cada tipo de usuario</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Rango de precio</div>
+                    <div class="metric-value">$899 – $3,299</div>
+                    <div class="metric-extra">Calidad profesional garantizada</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Gamers & creators</div>
+                    <div class="metric-value">144Hz <span>+ RTX</span></div>
+                    <div class="metric-extra">Listas para alto rendimiento</div>
+                </div>
+            </div>
+
+            <div class="hero-footer">
+                <div class="hero-tags">
+                    <div class="hero-tag"><strong>Visual</strong> · Catálogo sin funciones de compra</div>
+                    <div class="hero-tag">Diseño enfocado en <strong>presentación</strong></div>
+                    <div class="hero-tag">Ideal para <strong>mockups</strong> y prototipos</div>
+                </div>
+
+                <div class="hero-image-wrapper">
+                    <div class="hero-image-card">
+                        <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=80" alt="Laptop premium">
+                        <div class="hero-image-badge">
+                            <div class="hero-dot"></div>
+                            <span>Vista general · Línea NeoLaptop Pro</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANEL LATERAL: LAPTOPS DESTACADAS -->
+        <aside class="side-panel">
+            <div class="side-header">
+                <div class="side-header-title">Laptops destacadas de la semana</div>
+                <div class="side-header-info">Selección visual · No interactivo</div>
+                <div class="side-header-dot">
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="side-grid">
+                <!-- CARD 1 -->
+                <article class="laptop-card">
+                    <div class="laptop-image">
+                        <img src="https://img.freepik.com/premium-photo/highspeed-laptop-with-red-neon-trails-velocity-visualized_68708-5484.jpg?w=2000" alt="Laptop gaming">
+                        <div class="laptop-tag-pill">Gaming</div>
+                    </div>
+                    <div class="laptop-body">
+                        <div class="laptop-main-row">
+                            <div>
+                                <div class="laptop-title">NeoLaptop Velocity 17"</div>
+                                <div class="laptop-series">Intel i9 · RTX 4080 · 32 GB RAM</div>
+                            </div>
+                            <div class="laptop-price-block">
+                                <div class="laptop-label">Top gamer</div>
+                                <div class="laptop-price">$2,699 <span>USD</span></div>
+                            </div>
+                        </div>
+                        <div class="laptop-specs">
+                            <div class="spec-pill highlight">Pantalla 17.3" QHD · 240 Hz</div>
+                            <div class="spec-pill">2 TB NVMe Gen4</div>
+                            <div class="spec-pill">Teclado RGB por tecla</div>
+                            <div class="spec-pill">Wi-Fi 6E · Thunderbolt 4</div>
+                        </div>
+                        <div class="laptop-footer-row">
+                            <div class="laptop-badges">
+                                <div class="badge-square">Para e-sports</div>
+                                <div class="badge-square">Streaming 4K</div>
+                            </div>
+                            <div class="rating">
+                                <div class="stars">★★★★★</div>
+                                <span>4.9 · Línea gamer</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- CARD 2 -->
+                <article class="laptop-card">
+                    <div class="laptop-image">
+                        <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=900&q=80" alt="Ultrabook">
+                        <div class="laptop-tag-pill">Ultrabook</div>
+                    </div>
+                    <div class="laptop-body">
+                        <div class="laptop-main-row">
+                            <div>
+                                <div class="laptop-title">NeoLaptop Air Studio 14"</div>
+                                <div class="laptop-series">Intel i7 Evo · 16 GB RAM</div>
+                            </div>
+                            <div class="laptop-price-block">
+                                <div class="laptop-label">Más ligero</div>
+                                <div class="laptop-price">$1,399 <span>USD</span></div>
+                            </div>
+                        </div>
+                        <div class="laptop-specs">
+                            <div class="spec-pill highlight">1.1 kg · 13 mm grosor</div>
+                            <div class="spec-pill">512 GB NVMe</div>
+                            <div class="spec-pill">Pantalla 14" 2.8K OLED</div>
+                            <div class="spec-pill">Hasta 18 h de batería</div>
+                        </div>
+                        <div class="laptop-footer-row">
+                            <div class="laptop-badges">
+                                <div class="badge-square">Portabilidad</div>
+                                <div class="badge-square">Oficina & universidad</div>
+                            </div>
+                            <div class="rating">
+                                <div class="stars">★★★★☆</div>
+                                <span>4.7 · Uso diario</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- CARD 3 -->
+                <article class="laptop-card">
+                    <div class="laptop-image">
+                        <img src="https://images.unsplash.com/photo-1559163499-413811fb2344?auto=format&fit=crop&w=900&q=80" alt="Workstation">
+                        <div class="laptop-tag-pill">Workstation</div>
+                    </div>
+                    <div class="laptop-body">
+                        <div class="laptop-main-row">
+                            <div>
+                                <div class="laptop-title">NeoLaptop Creator 16"</div>
+                                <div class="laptop-series">Ryzen 9 · RTX 4070 · 64 GB RAM</div>
+                            </div>
+                            <div class="laptop-price-block">
+                                <div class="laptop-label">Creadores</div>
+                                <div class="laptop-price">$2,199 <span>USD</span></div>
+                            </div>
+                        </div>
+                        <div class="laptop-specs">
+                            <div class="spec-pill highlight">Pantalla 16" 4K HDR</div>
+                            <div class="spec-pill">2 × 2 TB NVMe</div>
+                            <div class="spec-pill">Color 100% DCI-P3</div>
+                            <div class="spec-pill">Chasis aluminio</div>
+                        </div>
+                        <div class="laptop-footer-row">
+                            <div class="laptop-badges">
+                                <div class="badge-square">Edición video</div>
+                                <div class="badge-square">Render 3D</div>
+                            </div>
+                            <div class="rating">
+                                <div class="stars">★★★★★</div>
+                                <span>4.8 · Pro</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- CARD 4 -->
+                <article class="laptop-card">
+                    <div class="laptop-image">
+                        <img src="https://img.freepik.com/premium-photo/futuristic-laptop_662093-1369.jpg?w=2000" alt="Laptop económica">
+                        <div class="laptop-tag-pill">Essentials</div>
+                    </div>
+                    <div class="laptop-body">
+                        <div class="laptop-main-row">
+                            <div>
+                                <div class="laptop-title">NeoLaptop Core 15"</div>
+                                <div class="laptop-series">Intel i5 · 8 GB RAM</div>
+                            </div>
+                            <div class="laptop-price-block">
+                                <div class="laptop-label">Equilibrada</div>
+                                <div class="laptop-price">$899 <span>USD</span></div>
+                            </div>
+                        </div>
+                        <div class="laptop-specs">
+                            <div class="spec-pill highlight">Pantalla 15.6" FHD</div>
+                            <div class="spec-pill">512 GB SSD</div>
+                            <div class="spec-pill">Teclado numérico</div>
+                            <div class="spec-pill">Ideal oficina & estudio</div>
+                        </div>
+                        <div class="laptop-footer-row">
+                            <div class="laptop-badges">
+                                <div class="badge-square">Productividad</div>
+                                <div class="badge-square">Relación calidad/precio</div>
+                            </div>
+                            <div class="rating">
+                                <div class="stars">★★★★☆</div>
+                                <span>4.5 · Oficina</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </aside>
+    </main>
+
+    <!-- CATÁLOGO MINIATURAS -->
+    <section class="catalog-section">
+        <div class="catalog-header">
+            <div>
+                <div class="catalog-title">Catálogo visual de la tienda</div>
+                <div class="catalog-subtitle">
+                    Vista rápida de modelos adicionales · totalmente visual, sin acciones de compra.
+                </div>
+            </div>
+            <div class="catalog-pills">
+                <div class="catalog-pill">Series NeoLaptop Air</div>
+                <div class="catalog-pill">Series Velocity Gaming</div>
+                <div class="catalog-pill">Series Creator Studio</div>
+                <div class="catalog-pill">Series Core Essentials</div>
+            </div>
+        </div>
+
+        <div class="catalog-grid">
+            <!-- Mini 1 -->
+            <article class="mini-card">
+                <img src="https://macfinder.co.uk/wp-content/uploads/2022/12/img-MacBook-Air-13-Inch-65353.jpg" alt="Laptop catálogo 1">
+                <div class="mini-corner-tag">Air 13</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">Air 13" Silver</div>
+                    <div class="mini-price">$999</div>
+                </div>
+            </article>
+
+            <!-- Mini 2 -->
+            <article class="mini-card">
+                <img src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=900&q=80" alt="Laptop catálogo 2">
+                <div class="mini-corner-tag">Velocity</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">Velocity 15" RGB</div>
+                    <div class="mini-price">$1,799</div>
+                </div>
+            </article>
+
+            <!-- Mini 3 -->
+            <article class="mini-card">
+                <img src="https://laptopmedia.com/wp-content/uploads/2023/08/2-1-e1690896315566.jpg" alt="Laptop catálogo 3">
+                <div class="mini-corner-tag">Creator</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">Creator Studio 15"</div>
+                    <div class="mini-price">$1,999</div>
+                </div>
+            </article>
+
+            <!-- Mini 4 -->
+            <article class="mini-card">
+                <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=900&q=80" alt="Laptop catálogo 4">
+                <div class="mini-corner-tag">Dev</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">DevBook 14" Dark</div>
+                    <div class="mini-price">$1,249</div>
+                </div>
+            </article>
+
+            <!-- Mini 5 -->
+            <article class="mini-card">
+                <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=900&q=80" alt="Laptop catálogo 5">
+                <div class="mini-corner-tag">Core</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">Core 15" Office</div>
+                    <div class="mini-price">$949</div>
+                </div>
+            </article>
+
+            <!-- Mini 6 -->
+            <article class="mini-card">
+                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=900&q=80" alt="Laptop catálogo 6">
+                <div class="mini-corner-tag">Air</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">Air 14" Rose</div>
+                    <div class="mini-price">$1,089</div>
+                </div>
+            </article>
+
+            <!-- Mini 7 -->
+            <article class="mini-card">
+                <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=80" alt="Laptop catálogo 7">
+                <div class="mini-corner-tag">Studio</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">Studio Creator 16"</div>
+                    <div class="mini-price">$2,499</div>
+                </div>
+            </article>
+
+            <!-- Mini 8 -->
+            <article class="mini-card">
+                <img src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=900&q=80" alt="Laptop catálogo 8">
+                <div class="mini-corner-tag">Velocity</div>
+                <div class="mini-card-info">
+                    <div class="mini-name">Velocity 17" Max</div>
+                    <div class="mini-price">$3,299</div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        Sistema visual de <span>ventas de laptops</span> · sólo diseño estático sin procesos reales de compra ·
+        personaliza textos, imágenes y precios según tu proyecto.
+    </footer>
+</div>
+</body>
+</html>
